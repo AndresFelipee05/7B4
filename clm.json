@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Seleccione Región y provincia</h1>
+    <label for="">Region</label>
+    <select name="" id="regiones"></select>
+    
+    <label for="">Provincia</label>
+    <select name="" id="provincias"></select>
+
+    <script>
+        let regiones = document.getElementById("regiones");
+        let provincias = document.getElementById("provincias");
+
+        regiones.addEventListener("change", cargaProvincias);
+
+        cargaRegiones();
+
+        function cargaRegiones(){
+            fetch('archivo.json')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo JSON.');
+                    }
+                    return response.json(); // Convertimos la respuesta a JSON
+                })
+                .then(function(data) {
+                    for (let reg of data.regiones){
+                        let nuevaRegion = document.createElement("option");
+                        nuevaRegion.innerHTML = reg.nombre;
+                        nuevaRegion.value = reg.archivo;
+                        regiones.appendChild(nuevaRegion);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Se produjo un error al cargar el archivo JSON:', error);
+                });
+        }
+
+        function cargaProvincias(){
+            let archivo = regiones.value;
+            borraHijos(provincias); // Llamar a borraHijos() para limpiar las provincias antes de agregar nuevas
+
+            fetch(archivo)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo JSON.');
+                    }
+                    return response.json(); // Convertimos la respuesta a JSON
+                })
+                .then(function(data) {
+                    for (let prov of data.lista_provincias){
+                        let nuevaProvincia = document.createElement("option");
+                        nuevaProvincia.innerHTML = prov;
+                        nuevaProvincia.value = prov;
+                        provincias.appendChild(nuevaProvincia);
+                    }   
+                })
+                .catch(function(error) {
+                    console.error('Se produjo un error al cargar el archivo JSON:', error);
+                });
+        }
+
+        function borraHijos(elemento){
+            while(elemento.firstChild){
+                elemento.removeChild(elemento.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>
